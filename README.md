@@ -4,7 +4,7 @@
 
 Используемые технологии:
 
-Backend - MySQL, Express, Sequelize
+Backend - Node JS, MySQL, Express, Sequelize
 
 Frontend - React, Bootstrap, Axios
 
