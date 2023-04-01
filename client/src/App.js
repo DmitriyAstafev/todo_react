@@ -1,23 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect, useCallback } from "react";
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+import axios from "axios";
 
 function App() {
+  const [taskList, setTaskList] = useState([]);
+
+  // Загрузка списка задач с бэка
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/v1/task")
+      .then((res) => {
+        setTaskList(res.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  // Создание новой задачи
+  const createTaskHandler = useCallback((task) => {
+    axios
+      .post("http://localhost:5000/api/v1/task", task)
+      .then((res) => setTaskList((prev) => [...prev, res.data]))
+      .catch((err) => console.log(err));
+  }, []);
+
+  // Удаление задачи
+  const deleteTaskHandler = useCallback((id) => {
+    axios
+      .delete("http://localhost:5000/api/v1/task", { data: { id } })
+      .then((res) =>
+        setTaskList((prev) => prev.filter((task) => task.id !== res.data))
+      )
+      .catch((err) => console.log(err));
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container-sm">
+      <TaskForm createTaskHandler={createTaskHandler} />
+      <TaskList taskList={taskList} deleteTaskHandler={deleteTaskHandler} />
     </div>
   );
 }
